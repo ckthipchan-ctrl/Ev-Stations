@@ -1,0 +1,32 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // EV Charging Stations collection
+    // Public read access allows any EV driver to view real-time station availability, ports, and tariffs
+    match /charging_stations/{stationId} {
+      allow read: if true;
+      
+      // Updates to connector status and reviews can be submitted by verified users or crowdsourced drivers
+      allow update: if request.resource.data.diff(resource.data).affectedKeys()
+        .hasOnly(['connectors', 'reviews', 'updatedAt']);
+        
+      // Creating or deleting stations is restricted to administrators
+      allow create, delete: if request.auth != null && request.auth.token.admin == true;
+
+      // Nested real-time check-ins and community reports subcollection
+      match /check_ins/{checkInId} {
+        allow read: if true;
+        allow create: if request.resource.data.rating is number 
+          && request.resource.data.rating >= 1 
+          && request.resource.data.rating <= 5;
+        allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+      }
+    }
+
+    // User profiles & saved trips
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}

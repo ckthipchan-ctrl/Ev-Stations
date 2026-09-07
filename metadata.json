@@ -1,0 +1,10 @@
+{
+  "name": "EV Charging Station Finder & Trip Planner",
+  "description": "Production-ready EV Charging Station Finder & Trip Planner for Thailand with real-time Firestore sync, On-Peak/Off-Peak tariffs, and Google Maps routing.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
